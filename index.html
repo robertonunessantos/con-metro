@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relógio Digital e Cronômetro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #1a202c;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+<div class="flex flex-col items-center justify-center p-8 rounded-2xl shadow-xl bg-gray-800 border border-gray-700 max-w-lg w-full m-4">
+    <div class="w-full text-center mb-6">
+        <h1 class="text-3xl font-bold mb-4">Relógio e Cronômetro</h1>
+    </div>
+
+    <!-- Clock Section -->
+    <div class="flex flex-col items-center mb-8 w-full">
+        <h2 class="text-2xl font-semibold mb-2">Relógio Digital</h2>
+        <div id="clock" class="text-5xl font-mono p-4 bg-gray-700 rounded-xl shadow-inner w-full text-center">
+            00:00:00
+        </div>
+    </div>
+
+    <!-- Separator -->
+    <div class="w-1/2 h-px bg-gray-600 mb-8 rounded-full"></div>
+
+    <!-- Stopwatch Section -->
+    <div class="flex flex-col items-center w-full">
+        <h2 class="text-2xl font-semibold mb-2">Cronômetro</h2>
+        <div id="stopwatch" class="text-5xl font-mono p-4 bg-gray-700 rounded-xl shadow-inner w-full text-center">
+            00:00:00.00
+        </div>
+        <div class="flex space-x-4 mt-6">
+            <button id="start-btn" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                Iniciar
+            </button>
+            <button id="stop-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105" disabled>
+                Parar
+            </button>
+            <button id="reset-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105" disabled>
+                Reiniciar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Relógio Digital
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to display the clock immediately
+
+    // Cronômetro
+    const stopwatchDisplay = document.getElementById('stopwatch');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let startTime = 0;
+    let elapsedTime = 0;
+    let timerInterval;
+
+    function formatTime(ms) {
+        // Calcula horas, minutos e segundos como antes
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        // Calcula os centésimos de segundo
+        const hundredths = Math.floor((ms % 1000) / 10);
+
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMinutes = String(minutes).padStart(2, '0');
+        const formattedSeconds = String(seconds).padStart(2, '0');
+        const formattedHundredths = String(hundredths).padStart(2, '0');
+
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}.${formattedHundredths}`;
+    }
+
+    function startStopwatch() {
+        startTime = Date.now() - elapsedTime;
+        // Altera o intervalo para 10ms para contar em centésimos
+        timerInterval = setInterval(() => {
+            elapsedTime = Date.now() - startTime;
+            stopwatchDisplay.textContent = formatTime(elapsedTime);
+        }, 10);
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        resetBtn.disabled = false;
+    }
+
+    function stopStopwatch() {
+        clearInterval(timerInterval);
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+
+    function resetStopwatch() {
+        clearInterval(timerInterval);
+        elapsedTime = 0;
+        stopwatchDisplay.textContent = formatTime(elapsedTime);
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        resetBtn.disabled = true;
+    }
+
+    startBtn.addEventListener('click', startStopwatch);
+    stopBtn.addEventListener('click', stopStopwatch);
+    resetBtn.addEventListener('click', resetStopwatch);
+</script>
+
+</body>
+</html>
